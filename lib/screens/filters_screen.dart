@@ -3,6 +3,9 @@ import '../widgets/main_drawer.dart';
 
 class FiltersScreen extends StatefulWidget {
   static const routerName = '/filters';
+  final Function saveFilters;
+  final Map<String, bool> currentFilters;
+  FiltersScreen(this.currentFilters, this.saveFilters);
 
   @override
   _FiltersScreenState createState() => _FiltersScreenState();
@@ -13,6 +16,15 @@ class _FiltersScreenState extends State<FiltersScreen> {
   bool _vegetarian = false;
   bool _vegan = false;
   bool _lactoseFree = false;
+
+  @override
+  initState() {
+    _glutenFree = widget.currentFilters['gluten'];
+    _vegetarian = widget.currentFilters['vegetarian'];
+    _vegan = widget.currentFilters['vegan'];
+    _lactoseFree = widget.currentFilters['lactose'];
+    super.initState();
+  }
 
   Widget _buildSwitchListTitle(String title, String description,
       bool currentValue, Function updateValue) {
@@ -29,6 +41,19 @@ class _FiltersScreenState extends State<FiltersScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Your Filters'),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.save),
+                onPressed: () {
+                  final selectFilters = {
+                    'gluten': _glutenFree,
+                    'lactose': _lactoseFree,
+                    'vegan': _vegan,
+                    'vegetarian': _vegetarian,
+                  };
+                  widget.saveFilters(selectFilters);
+                })
+          ],
         ),
         drawer: MainDrawer(),
         body: Column(
@@ -68,9 +93,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     });
                   }),
                   _buildSwitchListTitle(
-                      'Vegan',
-                      'Only include vegan meals.',
-                      _vegan, (newValue) {
+                      'Vegan', 'Only include vegan meals.', _vegan, (newValue) {
                     setState(() {
                       _vegan = newValue;
                     });
